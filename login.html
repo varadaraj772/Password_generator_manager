@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    <script src="mobileview.js"></script>
+    <script src="config.js"></script>
+    <title>Login Page</title>
+    <style>
+      body {
+        background-color: #f8f9fa; /* Subtle light gray background color */
+      }
+
+      .rounded-container {
+        border-radius: 10px; /* Rounded corners */
+        background-color: #ffffff; /* Container background color */
+        padding: 20px; /* Add padding for better visual appearance */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container rounded-container mt-5" id="container_background">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <h2 class="text-center mb-4">Login Page</h2>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="inputEmail" class="form-label">Email address</label>
+              <input
+                type="email"
+                class="form-control"
+                id="inputEmail"
+                name="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="inputPassword" class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="inputPassword"
+                name="password"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-success">Login</button>
+            <button type="button" class="btn btn-danger" id="resetpassword">
+              Reset Password
+            </button>
+          </form>
+          <div class="mt-3 text-center">
+            <p>
+              Don't have an account?
+              <a href="createaccount.html" class="text-decoration-none"
+                >Create an account</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        sendPasswordResetEmail,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const auth = getAuth(app);
+      const db = getDatabase();
+      const dbref = ref(db);
+      let emailinput = document.getElementById("inputEmail");
+      let passinput = document.getElementById("inputPassword");
+      let mainform = document.getElementById("loginForm");
+      sessionStorage.setItem("allow_createaccount", "yes");
+      let reset_passowrd = () => {
+        sendPasswordResetEmail(auth, emailinput.value);
+        alert("please check your email");
+      };
+      document
+        .getElementById("resetpassword")
+        .addEventListener("click", reset_passowrd);
+      let login = (event) => {
+        event.preventDefault();
+        signInWithEmailAndPassword(auth, emailinput.value, passinput.value)
+          .then((credentials) => {
+            console.log(credentials.user.uid);
+            alert("sucessfull");
+            let user_id = credentials.user.uid;
+            get(child(dbref, "users/" + user_id)).then((snapshot) => {
+              if (snapshot.exists) {
+                sessionStorage.setItem("userid", credentials.user.uid);
+                console.log(sessionStorage.getItem("userid"));
+                window.location.href = "index.html";
+              } else {
+                alert("data does not exist!");
+              }
+            });
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      };
+      mainform.addEventListener("submit", login);
+    </script>
+  </body>
+</html>

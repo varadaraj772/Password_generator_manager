@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="mobileview.js"></script>
+    <script src="config.js"></script>
+    <title>Create Account Page</title>
+    <style>
+      body {
+        background-color: #f8f9fa; /* Subtle light gray background color */
+      }
+
+      .rounded-container {
+        border-radius: 10px; /* Rounded corners */
+        background-color: #ffffff; /* Container background color */
+        padding: 20px; /* Add padding for better visual appearance */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container rounded-container mt-5" id="container_background">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <h2 class="text-center mb-4">Create Account</h2>
+          <form id="createAccountForm">
+            <div class="mb-3">
+              <label for="inputName" class="form-label">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="name"
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="inputEmail" class="form-label">Email address</label>
+              <input
+                type="email"
+                class="form-control"
+                id="inputEmail"
+                name="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="inputPassword" class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="inputPassword"
+                name="password"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="inputPhoneNumber" class="form-label"
+                >Phone Number</label
+              >
+              <input
+                type="tel"
+                class="form-control"
+                id="inputPhoneNumber"
+                name="phone"
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-success" id="register">
+              Create Account
+            </button>
+          </form>
+          <div class="mt-2 text-center">
+            <p>
+              Already have an account?
+              <a href="login.html" class="text-decoration-none">Login here</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      import {
+        getDatabase,
+        set,
+        ref,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const auth = getAuth(app);
+      const db = getDatabase();
+      const dbref = ref(db);
+      let emailinput = document.getElementById("inputEmail");
+      let passinput = document.getElementById("inputPassword");
+      let nameinput = document.getElementById("inputName");
+      let mainform = document.getElementById("createAccountForm");
+
+      let reg = (event) => {
+        event.preventDefault();
+        createUserWithEmailAndPassword(auth, emailinput.value, passinput.value)
+          .then((credentials) => {
+            console.log(credentials);
+            let user_id = credentials.user.uid;
+            if (
+              set(ref(db, "useres/" + user_id), {
+                email: emailinput.value,
+                name: nameinput.value,
+              })
+            ) {
+              alert("sucessfull");
+              window.location.href = "login.html";
+            } else {
+              alert("Unsucessfull");
+            }
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      };
+      mainform.addEventListener("submit", reg);
+    </script>
+  </body>
+</html>
