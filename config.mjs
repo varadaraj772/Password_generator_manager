@@ -1,4 +1,4 @@
-export const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyAXl1m5z8BgrSKPAu1QQ8g7xPAVmIxcYPo",
   authDomain: "pass-manager-65b35.firebaseapp.com",
   databaseURL: "https://pass-manager-65b35-default-rtdb.firebaseio.com",
